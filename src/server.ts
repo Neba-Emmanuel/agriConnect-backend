@@ -1,0 +1,55 @@
+import express from "express";
+import dotenv from "dotenv";
+import cors from "cors";
+import connectDB from "./config/db";
+import bodyParser from "body-parser";
+import authRoutes from "./routes/authRoutes";
+import paymentRoute from "./routes/paymentRoute";
+
+// Load environment variables
+dotenv.config();
+
+// Connect to MongoDB
+connectDB();
+
+const app = express();
+
+// Middleware
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Your frontend URL
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
+app.use(bodyParser.json());
+
+// Error Handling Middleware
+app.use(
+  (
+    err: any,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    console.error(err.stack);
+    res.status(500).send("Something broke!");
+  }
+);
+
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
+// Routes
+app.use("/api", authRoutes);
+app.use("/api/payment", paymentRoute);
+
+app.get("/api/ping", (req, res) => {
+  res.send("pong");
+});
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => console.log(`Server started on port ${PORT}`));
