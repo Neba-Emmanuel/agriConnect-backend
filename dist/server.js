@@ -34,7 +34,7 @@ app.use((req, res, next) => {
 // Routes
 app.use("/api", authRoutes_1.default);
 app.use("/api/payment", paymentRoute_1.default);
-app.get("/api/ping", (req, res) => {
+app.get("/", (req, res) => {
     res.send("pong");
 });
 const PORT = process.env.PORT || 5000;

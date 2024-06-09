@@ -46,7 +46,7 @@ app.use((req, res, next) => {
 app.use("/api", authRoutes);
 app.use("/api/payment", paymentRoute);
 
-app.get("/api/ping", (req, res) => {
+app.get("/", (req, res) => {
   res.send("pong");
 });
 
