@@ -1,17 +1,18 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
-import User, { IUser } from "../models/Users"; // Adjusted import for the User model
+import User, { IUser } from "../models/Users";
 
 interface CustomRequest extends Request {
   user?: IUser;
 }
 
-export const authMiddleware = (
+export const authMiddleware = async (
   req: CustomRequest,
   res: Response,
   next: NextFunction
 ) => {
-  const token = req.header("x-auth-token");
+  const authHeader = req.header("Authorization");
+  const token = authHeader && authHeader.split(" ")[1];
 
   if (!token) {
     return res.status(401).json({ msg: "No token, authorization denied" });
@@ -19,7 +20,11 @@ export const authMiddleware = (
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
-    req.user = decoded.user;
+    const user = await User.findById(decoded.user.id);
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+    req.user = user;
     next();
   } catch (err) {
     res.status(401).json({ msg: "Token is not valid" });

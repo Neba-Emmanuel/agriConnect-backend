@@ -7,11 +7,11 @@ const router = (0, express_1.Router)();
 // @route   POST /auth/register
 // @desc    Register user
 // @access  Public
-router.post("/auth/register", authController_1.register);
+router.post("/register", authController_1.register);
 // @route   POST /auth/login
 // @desc    Login user & get token
 // @access  Public
-router.post("/auth/login", authController_1.login);
+router.post("/login", authController_1.login);
 // @route   GET /user
 // @desc    Get user info
 // @access  Private

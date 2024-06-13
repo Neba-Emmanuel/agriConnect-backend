@@ -12,12 +12,12 @@ const router = Router();
 // @route   POST /auth/register
 // @desc    Register user
 // @access  Public
-router.post("/auth/register", register);
+router.post("/register", register);
 
 // @route   POST /auth/login
 // @desc    Login user & get token
 // @access  Public
-router.post("/auth/login", login);
+router.post("/login", login);
 
 // @route   GET /user
 // @desc    Get user info

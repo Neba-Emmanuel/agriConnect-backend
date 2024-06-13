@@ -43,8 +43,8 @@ app.use((req, res, next) => {
 });
 
 // Routes
-app.use("/api", authRoutes);
-app.use("/api/payment", paymentRoute);
+app.use("/auth", authRoutes);
+app.use("/payment", paymentRoute);
 
 app.get("/", (req, res) => {
   res.send("pong");
