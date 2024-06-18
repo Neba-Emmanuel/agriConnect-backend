@@ -5,6 +5,8 @@ import connectDB from "./config/db";
 import bodyParser from "body-parser";
 import authRoutes from "./routes/authRoutes";
 import paymentRoute from "./routes/paymentRoute";
+import orderRoute from "./routes/orderRoute";
+import otpRoute from "./routes/otpRoute";
 
 // Load environment variables
 dotenv.config();
@@ -17,7 +19,7 @@ const app = express();
 // Middleware
 app.use(
   cors({
-    origin: "http://localhost:3000", // Your frontend URL
+    origin: "http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
@@ -45,6 +47,8 @@ app.use((req, res, next) => {
 // Routes
 app.use("/auth", authRoutes);
 app.use("/payment", paymentRoute);
+app.use("/orders", orderRoute);
+app.use("/otp", otpRoute);
 
 app.get("/", (req, res) => {
   res.send("pong");

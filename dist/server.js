@@ -10,6 +10,8 @@ const db_1 = __importDefault(require("./config/db"));
 const body_parser_1 = __importDefault(require("body-parser"));
 const authRoutes_1 = __importDefault(require("./routes/authRoutes"));
 const paymentRoute_1 = __importDefault(require("./routes/paymentRoute"));
+const orderRoute_1 = __importDefault(require("./routes/orderRoute"));
+const otpRoute_1 = __importDefault(require("./routes/otpRoute"));
 // Load environment variables
 dotenv_1.default.config();
 // Connect to MongoDB
@@ -17,7 +19,7 @@ dotenv_1.default.config();
 const app = (0, express_1.default)();
 // Middleware
 app.use((0, cors_1.default)({
-    origin: "http://localhost:3000", // Your frontend URL
+    origin: "http://localhost:3000",
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
 }));
@@ -34,6 +36,8 @@ app.use((req, res, next) => {
 // Routes
 app.use("/auth", authRoutes_1.default);
 app.use("/payment", paymentRoute_1.default);
+app.use("/orders", orderRoute_1.default);
+app.use("/otp", otpRoute_1.default);
 app.get("/", (req, res) => {
     res.send("pong");
 });

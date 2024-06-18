@@ -6,26 +6,30 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.collectPayment = void 0;
 const lib_1 = require("@hachther/mesomb/lib");
 const Payments_1 = __importDefault(require("../models/Payments"));
+const Orders_1 = require("../models/Orders");
 const Users_1 = __importDefault(require("../models/Users"));
+const mongoose_1 = __importDefault(require("mongoose"));
 const collectPayment = async (req, res) => {
-    const { amount, service, payer } = req.body;
-    if (!amount || !service || !payer) {
+    const { amount, service, payer, products, address } = req.body;
+    if (!amount || !service || !payer || !products || !address) {
         return res.status(400).json({ error: "Missing required fields" });
     }
+    const session = await mongoose_1.default.startSession();
+    session.startTransaction();
     try {
-        // Get the authenticated user ID
         const userId = req.user._id;
-        // Verify the user exists
         const user = await Users_1.default.findById(userId);
         if (!user) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(404).json({ error: "User not found" });
         }
-        const payment = new lib_1.PaymentOperation({
+        const paymentOperation = new lib_1.PaymentOperation({
             applicationKey: process.env.MESOMB_APPLICATION_KEY,
             accessKey: process.env.MESOMB_ACCESS_KEY,
             secretKey: process.env.MESOMB_SECRET_KEY,
         });
-        const response = await payment.makeCollect({
+        const response = await paymentOperation.makeCollect({
             amount,
             service,
             payer,
@@ -38,7 +42,23 @@ const collectPayment = async (req, res) => {
             payer,
             status: response.isTransactionSuccess() ? "success" : "failed",
         });
-        await paymentDetails.save();
+        await paymentDetails.save({ session });
+        if (response.isTransactionSuccess()) {
+            const orderProducts = await Promise.all(products.map(async (product) => {
+                const productData = await Orders_1.Product.findById(product.productId);
+                return { productId: productData?._id, quantity: product.quantity };
+            }));
+            const order = new Orders_1.Order({
+                user: user._id,
+                products: orderProducts,
+                totalAmount: amount,
+                address,
+                status: "pending",
+            });
+            await order.save({ session });
+        }
+        await session.commitTransaction();
+        session.endSession();
         return res.status(200).json({
             operationSuccess: response.isOperationSuccess(),
             transactionSuccess: response.isTransactionSuccess(),
@@ -46,6 +66,8 @@ const collectPayment = async (req, res) => {
         });
     }
     catch (error) {
+        await session.abortTransaction();
+        session.endSession();
         console.error("Payment error:", error);
         return res.status(500).json({ error: "Payment processing failed" });
     }
