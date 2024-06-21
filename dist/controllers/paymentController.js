@@ -6,7 +6,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.collectPayment = void 0;
 const lib_1 = require("@hachther/mesomb/lib");
 const Payments_1 = __importDefault(require("../models/Payments"));
-const Orders_1 = require("../models/Orders");
+const Orders_1 = __importDefault(require("../models/Orders"));
+const Products_1 = __importDefault(require("../models/Products"));
 const Users_1 = __importDefault(require("../models/Users"));
 const mongoose_1 = __importDefault(require("mongoose"));
 const collectPayment = async (req, res) => {
@@ -45,10 +46,10 @@ const collectPayment = async (req, res) => {
         await paymentDetails.save({ session });
         if (response.isTransactionSuccess()) {
             const orderProducts = await Promise.all(products.map(async (product) => {
-                const productData = await Orders_1.Product.findById(product.productId);
+                const productData = await Products_1.default.findById(product.productId);
                 return { productId: productData?._id, quantity: product.quantity };
             }));
-            const order = new Orders_1.Order({
+            const order = new Orders_1.default({
                 user: user._id,
                 products: orderProducts,
                 totalAmount: amount,

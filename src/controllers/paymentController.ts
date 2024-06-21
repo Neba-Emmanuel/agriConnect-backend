@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import { PaymentOperation, RandomGenerator } from "@hachther/mesomb/lib";
 import Payment, { IPayment } from "../models/Payments";
-import { Order, Product } from "../models/Orders";
+import Order from "../models/Orders";
+import Product from "../models/Products";
 import User from "../models/Users";
 import mongoose from "mongoose";
 

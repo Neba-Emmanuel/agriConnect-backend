@@ -1,11 +1,5 @@
 import mongoose from "mongoose";
-
-const ProductSchema = new mongoose.Schema({
-  name: String,
-  price: Number,
-});
-
-const Product = mongoose.model("Product", ProductSchema);
+import Product from "./Products";
 
 const OrderSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -27,4 +21,4 @@ const OrderSchema = new mongoose.Schema({
 
 const Order = mongoose.model("Order", OrderSchema);
 
-export { Order, Product };
+export default Order;
